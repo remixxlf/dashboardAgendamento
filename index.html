@@ -2,177 +2,350 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Painel da Barbearia</title>
   <style>
-    *  { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --preto:    #111;
-      --cinza:    #1e1e1e;
-      --borda:    #2e2e2e;
-      --texto:    #eeeeee;
+      --bg:       #0f0f0f;
+      --card:     #1a1a1a;
+      --borda:    #2a2a2a;
+      --texto:    #e0e0e0;
+      --muted:    #666;
       --accent:   #e8b84b;
-      --verde:    #52c97a;
+      --verde:    #4caf88;
       --vermelho: #e05252;
     }
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: var(--preto);
+      background: var(--bg);
       color: var(--texto);
       min-height: 100vh;
     }
 
-    /* ── Header ── */
+    /* ─── HEADER ─────────────────────────────────── */
     header {
-      background: var(--cinza);
+      position: sticky; top: 0; z-index: 100;
+      background: var(--card);
       border-bottom: 1px solid var(--borda);
-      padding: 14px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      padding: 14px 20px 0;
     }
+    .header-top {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 12px;
+    }
+    .header-top h1 { font-size: 1.05rem; color: var(--accent); }
+    .header-top span { font-size: 0.8rem; color: var(--muted); }
 
-    .header-top h1 { font-size: 1.15rem; color: var(--accent); }
-
-    .tabs { display: flex; gap: 8px; }
-
+    /* ─── TABS ───────────────────────────────────── */
+    .tabs { display: flex; gap: 4px; }
     .tab-btn {
-      padding: 8px 16px;
-      border: 1px solid var(--borda);
-      border-radius: 8px;
-      background: transparent;
-      color: var(--texto);
-      cursor: pointer;
-      font-size: 0.88rem;
+      padding: 8px 18px;
+      border: none; border-bottom: 2px solid transparent;
+      background: transparent; color: var(--muted);
+      font-size: 0.88rem; cursor: pointer;
       transition: all 0.2s;
     }
-    .tab-btn.active {
-      background: var(--accent);
-      color: var(--preto);
-      border-color: var(--accent);
-      font-weight: 700;
-    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-    /* ── Main ── */
-    main { padding: 20px; max-width: 620px; margin: 0 auto; }
+    /* ─── MAIN ───────────────────────────────────── */
+    main { padding: 20px; max-width: 600px; margin: 0 auto; }
 
-    .tab-content         { display: none; }
-    .tab-content.active  { display: block; }
+    .tab-content        { display: none; }
+    .tab-content.active { display: block; }
 
-    /* ── Nav data ── */
+    /* ─── NAVEGAÇÃO DE DATA ──────────────────────── */
     .nav-data {
-      display: flex;
-      align-items: center;
+      display: flex; align-items: center;
       justify-content: space-between;
-      background: var(--cinza);
-      border: 1px solid var(--borda);
-      border-radius: 10px;
-      padding: 12px 16px;
+      background: var(--card); border: 1px solid var(--borda);
+      border-radius: 10px; padding: 10px 16px;
       margin-bottom: 16px;
     }
     .nav-data button {
       background: none; border: none;
-      color: var(--accent); font-size: 1.5rem;
-      cursor: pointer; padding: 0 8px;
+      color: var(--accent); font-size: 1.4rem;
+      cursor: pointer; line-height: 1; padding: 0 6px;
     }
-    .nav-data span { font-weight: 600; }
+    .nav-data button:disabled { color: var(--borda); cursor: default; }
+    #labelData { font-weight: 600; font-size: 0.95rem; }
 
-    /* ── Cards de agendamento ── */
+    /* ─── CARDS DE AGENDAMENTO ───────────────────── */
     .card {
-      background: var(--cinza);
-      border: 1px solid var(--borda);
-      border-radius: 10px;
-      padding: 14px 16px;
+      background: var(--card); border: 1px solid var(--borda);
+      border-radius: 10px; padding: 12px 16px;
       margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
+      display: flex; align-items: center; gap: 14px;
     }
-    .card .horario { font-size: 1.1rem; font-weight: 700; color: var(--accent); min-width: 50px; }
+    .card .horario {
+      font-size: 1rem; font-weight: 700;
+      color: var(--accent); min-width: 52px;
+    }
     .card .info    { flex: 1; }
-    .card .nome    { font-weight: 600; font-size: 0.95rem; }
-    .card .servico { font-size: 0.82rem; color: #999; margin-top: 2px; }
-    .card .acoes   { display: flex; align-items: center; gap: 8px; }
+    .card .nome    { font-weight: 600; font-size: 0.93rem; }
+    .card .servico { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
 
     .badge {
-      font-size: 0.72rem; padding: 2px 8px;
+      font-size: 0.7rem; padding: 2px 9px;
       border-radius: 20px; border: 1px solid;
+      white-space: nowrap;
     }
-    .badge-agendado  { color: var(--accent);   border-color: var(--accent); }
+    .badge-agendado  { color: var(--accent);  border-color: var(--accent); }
     .badge-concluido { color: var(--verde);    border-color: var(--verde); }
     .badge-cancelado { color: var(--vermelho); border-color: var(--vermelho); }
 
-    .btn-cancelar {
+    .btn-cancel-ag {
       background: none; border: 1px solid var(--vermelho);
       color: var(--vermelho); border-radius: 6px;
-      padding: 4px 10px; font-size: 0.8rem; cursor: pointer;
+      padding: 4px 10px; font-size: 0.78rem; cursor: pointer;
     }
-    .btn-cancelar:hover { background: var(--vermelho); color: #fff; }
+    .btn-cancel-ag:hover { background: var(--vermelho); color: #fff; }
 
-    .vazio { text-align: center; color: #555; padding: 48px 0; font-size: 0.9rem; }
+    .vazio {
+      text-align: center; color: var(--muted);
+      padding: 60px 0; font-size: 0.9rem;
+    }
+    .vazio span { font-size: 2rem; display: block; margin-bottom: 10px; }
 
-    /* ── Configurações ── */
+    /* ─── CONFIGURAÇÕES ──────────────────────────── */
     .secao {
-      background: var(--cinza);
-      border: 1px solid var(--borda);
-      border-radius: 10px;
-      padding: 16px;
+      background: var(--card); border: 1px solid var(--borda);
+      border-radius: 10px; padding: 16px;
       margin-bottom: 14px;
     }
-    .secao h3 { font-size: 0.9rem; color: var(--accent); margin-bottom: 12px; }
-
-    .linha {
-      display: flex; gap: 12px;
-      align-items: center; margin-bottom: 10px;
-    }
-    .linha label { font-size: 0.83rem; color: #999; min-width: 90px; }
-    .linha input, .linha select {
-      flex: 1;
-      background: var(--preto); border: 1px solid var(--borda);
-      border-radius: 6px; color: var(--texto);
-      padding: 8px 10px; font-size: 0.88rem;
+    .secao h3 {
+      font-size: 0.82rem; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--accent);
+      margin-bottom: 14px;
     }
 
-    .dias-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
-    .dia-check {
+    .campo {
+      display: flex; align-items: center;
+      gap: 10px; margin-bottom: 10px;
+    }
+    .campo label { font-size: 0.82rem; color: var(--muted); min-width: 110px; }
+    .campo input, .campo select {
+      flex: 1; background: var(--bg);
+      border: 1px solid var(--borda); border-radius: 6px;
+      color: var(--texto); padding: 8px 10px; font-size: 0.85rem;
+    }
+    .campo input:focus, .campo select:focus {
+      outline: none; border-color: var(--accent);
+    }
+
+    /* Dias da semana */
+    .dias-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+    .dia-label {
       display: flex; flex-direction: column;
-      align-items: center; gap: 4px;
+      align-items: center; gap: 5px;
       font-size: 0.75rem; cursor: pointer;
     }
-    .dia-check input { width: 18px; height: 18px; accent-color: var(--accent); }
+    .dia-label input { accent-color: var(--accent); width: 16px; height: 16px; }
 
     /* Serviços */
-    .sv-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-    .sv-item input {
-      flex: 1; background: var(--preto); border: 1px solid var(--borda);
-      border-radius: 6px; color: var(--texto); padding: 7px 10px; font-size: 0.85rem;
+    .sv-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .sv-row input {
+      flex: 1; background: var(--bg);
+      border: 1px solid var(--borda); border-radius: 6px;
+      color: var(--texto); padding: 7px 10px; font-size: 0.84rem;
     }
-    .btn-remover {
+    .sv-row input:focus { outline: none; border-color: var(--accent); }
+    .btn-rm {
       background: none; border: 1px solid var(--vermelho);
       color: var(--vermelho); border-radius: 6px;
-      padding: 6px 10px; cursor: pointer; font-size: 0.85rem;
+      padding: 5px 9px; cursor: pointer; font-size: 0.8rem;
     }
-    .btn-add {
-      background: none; border: 1px dashed var(--borda);
-      color: #777; border-radius: 8px;
-      padding: 8px; cursor: pointer; font-size: 0.85rem; width: 100%; margin-top: 4px;
+    .btn-add-sv {
+      width: 100%; background: none;
+      border: 1px dashed var(--borda); color: var(--muted);
+      border-radius: 8px; padding: 8px; cursor: pointer;
+      font-size: 0.83rem; margin-top: 4px;
     }
-    .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-add-sv:hover { border-color: var(--accent); color: var(--accent); }
 
     .btn-salvar {
-      background: var(--accent); color: var(--preto);
+      width: 100%; background: var(--accent); color: #111;
       border: none; border-radius: 8px;
-      padding: 10px 20px; font-weight: 700;
-      cursor: pointer; font-size: 0.9rem; width: 100%;
+      padding: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
     }
-    .btn-salvar:hover { opacity: 0.85; }
+    .btn-salvar:hover { opacity: 0.88; }
 
-    /* ── Modal ── */
-    .modal-overlay {
-      position: fixed; inset: 0;
+    /* ─── SENHA ──────────────────────────────────── */
+    .tela-senha {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: calc(100vh - 80px); gap: 16px;
     }
+    .tela-senha h2 { font-size: 1rem; color: var(--accent); }
+    .tela-senha input {
+      width: 240px; background: var(--card);
+      border: 1px solid var(--borda); border-radius: 8px;
+      color: var(--texto); padding: 10px 14px;
+      font-size: 1rem; text-align: center; letter-spacing: 4px;
+    }
+    .tela-senha input:focus { outline: none; border-color: var(--accent); }
+    .tela-senha button {
+      width: 240px; background: var(--accent); color: #111;
+      border: none; border-radius: 8px;
+      padding: 10px; font-weight: 700; cursor: pointer;
+    }
+    .erro-senha { color: var(--vermelho); font-size: 0.82rem; }
+
+    /* ─── MODAL ──────────────────────────────────── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.7); z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .overlay.hidden { display: none; }
+    .modal {
+      background: var(--card); border: 1px solid var(--borda);
+      border-radius: 12px; padding: 24px;
+      width: 90%; max-width: 360px; text-align: center;
+    }
+    .modal p { margin-bottom: 20px; font-size: 0.92rem; line-height: 1.5; }
+    .modal-btns { display: flex; gap: 10px; }
+    .modal-btns button {
+      flex: 1; padding: 10px; border-radius: 8px;
+      font-weight: 700; cursor: pointer; font-size: 0.88rem;
+    }
+    .btn-sim { background: var(--vermelho); color: #fff; border: none; }
+    .btn-nao { background: none; border: 1px solid var(--borda); color: var(--texto); }
+    .btn-sim:hover { opacity: 0.85; }
+
+    /* ─── TOAST ──────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--verde); color: #fff;
+      padding: 10px 24px; border-radius: 20px;
+      font-size: 0.85rem; font-weight: 600;
+      opacity: 0; transition: opacity 0.3s;
+      pointer-events: none; z-index: 300;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<!-- ════ HEADER ════════════════════════════════════════════════ -->
+<header>
+  <div class="header-top">
+    <h1 id="nomeBar">✂️ Barbearia</h1>
+    <span id="statusBar">⚪ carregando...</span>
+  </div>
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="mudarTab('agendamentos', this)">📅 Agendamentos</button>
+    <button class="tab-btn"       onclick="abrirConfigs(this)">⚙️ Configurações</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ════ ABA: AGENDAMENTOS ════════════════════════════════════ -->
+  <div id="tab-agendamentos" class="tab-content active">
+    <div class="nav-data">
+      <button id="btnAntes" onclick="mudarData(-1)">‹</button>
+      <span id="labelData">—</span>
+      <button onclick="mudarData(1)">›</button>
+    </div>
+    <div id="listaAgendamentos"></div>
+  </div>
+
+  <!-- ════ ABA: CONFIGURAÇÕES ══════════════════════════════════ -->
+  <div id="tab-configuracoes" class="tab-content">
+
+    <!-- Tela de senha -->
+    <div id="telaSenha" class="tela-senha">
+      <h2>🔒 Área restrita</h2>
+      <input type="password" id="inputSenha" placeholder="••••••" maxlength="20"
+             onkeydown="if(event.key==='Enter') verificarSenha()" />
+      <button onclick="verificarSenha()">Entrar</button>
+      <span id="erroSenha" class="erro-senha"></span>
+    </div>
+
+    <!-- Painel de configurações -->
+    <div id="painelConfig" style="display:none">
+
+      <div class="secao">
+        <h3>🕐 Horários de atendimento</h3>
+        <div class="campo">
+          <label>Início</label>
+          <input type="time" id="cfgInicio" />
+        </div>
+        <div class="campo">
+          <label>Término</label>
+          <input type="time" id="cfgFim" />
+        </div>
+        <div class="campo">
+          <label>Intervalo</label>
+          <select id="cfgIntervalo">
+            <option value="15">15 min</option>
+            <option value="20">20 min</option>
+            <option value="30" selected>30 min</option>
+            <option value="45">45 min</option>
+            <option value="60">1 hora</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="secao">
+        <h3>🍽️ Pausa para almoço</h3>
+        <div class="campo">
+          <label>Início</label>
+          <input type="time" id="cfgAlmocoInicio" />
+        </div>
+        <div class="campo">
+          <label>Término</label>
+          <input type="time" id="cfgAlmocoFim" />
+        </div>
+      </div>
+
+      <div class="secao">
+        <h3>📆 Dias de folga (semanal)</h3>
+        <div class="dias-grid" id="diasGrid"></div>
+      </div>
+
+      <div class="secao">
+        <h3>✂️ Serviços</h3>
+        <div id="listaServicos"></div>
+        <button class="btn-add-sv" onclick="adicionarServico()">+ Adicionar serviço</button>
+      </div>
+
+      <div class="secao">
+        <h3>🔑 Alterar senha do painel</h3>
+        <div class="campo">
+          <label>Nova senha</label>
+          <input type="password" id="cfgNovaSenha" placeholder="Nova senha" />
+        </div>
+        <div class="campo">
+          <label>Confirmar</label>
+          <input type="password" id="cfgConfSenha" placeholder="Confirme" />
+        </div>
+      </div>
+
+      <button class="btn-salvar" onclick="salvarConfigs()">💾 Salvar configurações</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- ════ MODAL ═════════════════════════════════════════════════ -->
+<div id="overlay" class="overlay hidden">
+  <div class="modal">
+    <p id="modalTexto"></p>
+    <div class="modal-btns">
+      <button class="btn-nao" onclick="fecharModal()">Não</button>
+      <button class="btn-sim" onclick="confirmarCancelamento()">Cancelar agendamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ TOAST ════════════════════════════════════════════════ -->
+<div id="toast" class="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
