@@ -1,7 +1,6 @@
 // ══ CONFIG ═══════════════════════════════════════════════════
 const SUPABASE_URL      = 'https://kuvqqcfeysdllpoklryz.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_mkeFhZVMVGwyIcLo042Q1A__kX-hNzi';
-
+const SUPABASE_KEY = 'sb_publishable_mkeFhZVMVGwyIcLo042Q1A__kX-hNzi';
 const headers = {
   'Content-Type':  'application/json',
   'apikey':        SUPABASE_KEY,
