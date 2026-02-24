@@ -3,230 +3,176 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Barbearia — Painel de Agendamentos</title>
+  <title>Painel da Barbearia</title>
   <style>
-    /* === RESET & BASE === */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *  { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --preto:    #111;
+      --cinza:    #1e1e1e;
+      --borda:    #2e2e2e;
+      --texto:    #eeeeee;
+      --accent:   #e8b84b;
+      --verde:    #52c97a;
+      --vermelho: #e05252;
+    }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #0f0f0f;
-      color: #e0e0e0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--preto);
+      color: var(--texto);
       min-height: 100vh;
     }
 
-    /* === CABEÇALHO === */
+    /* ── Header ── */
     header {
-      background: #1a1a1a;
-      border-bottom: 2px solid #c9a84c;
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    header h1 { font-size: 1.4rem; color: #c9a84c; letter-spacing: 1px; }
-    header span { font-size: 0.85rem; color: #666; margin-left: auto; }
-
-    /* === LAYOUT PRINCIPAL === */
-    main { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
-
-    /* === CONTROLES DE MÊS/ANO === */
-    .controls {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    .controls label { color: #888; font-size: 0.85rem; }
-    .controls select {
-      background: #1e1e1e;
-      color: #e0e0e0;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 0.45rem 0.9rem;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-    .controls select:focus { outline: none; border-color: #c9a84c; }
-    .controls button {
-      background: #c9a84c;
-      color: #111;
-      border: none;
-      border-radius: 6px;
-      padding: 0.45rem 1.1rem;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .controls button:hover { background: #b8943e; }
-
-    /* === CALENDÁRIO === */
-    .calendario {
-      background: #1a1a1a;
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      border: 1px solid #2a2a2a;
-    }
-    .calendario h2 {
-      text-align: center;
-      color: #c9a84c;
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
-    }
-    .grade-semana {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      text-align: center;
-      margin-bottom: 6px;
-    }
-    .grade-semana span {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: #666;
-      text-transform: uppercase;
-      padding: 0.25rem 0;
-    }
-    .grade-dias {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-    }
-    .dia-celula {
-      min-height: 62px;
-      border-radius: 8px;
-      padding: 6px 4px;
-      cursor: pointer;
-      background: #222;
-      border: 1px solid transparent;
-      transition: border-color 0.15s, background 0.15s;
+      background: var(--cinza);
+      border-bottom: 1px solid var(--borda);
+      padding: 14px 20px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-    .dia-celula:hover  { border-color: #c9a84c; background: #2a2a2a; }
-    .dia-celula.ativo  { border-color: #c9a84c; background: #2e2a1a; }
-    .dia-celula.vazio  { background: transparent; cursor: default; pointer-events: none; border-color: transparent; }
-    .dia-celula.hoje .num-dia { color: #c9a84c; font-weight: 800; }
-    .num-dia { font-size: 0.85rem; color: #ccc; font-weight: 600; }
-    .qtd-badge {
-      background: #c9a84c;
-      color: #111;
-      font-size: 0.68rem;
-      font-weight: 800;
-      border-radius: 99px;
-      padding: 1px 7px;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
-    /* === PAINEL DE DETALHES === */
-    .painel-detalhes {
-      background: #1a1a1a;
-      border-radius: 12px;
-      padding: 1.5rem;
-      border: 1px solid #2a2a2a;
-      min-height: 220px;
-    }
-    .painel-detalhes h2 {
-      color: #c9a84c;
-      font-size: 1rem;
-      margin-bottom: 1rem;
-      text-transform: capitalize;
-    }
+    .header-top h1 { font-size: 1.15rem; color: var(--accent); }
 
-    /* === CARDS DE AGENDAMENTOS === */
-    .lista-agendamentos { display: flex; flex-direction: column; gap: 0.65rem; }
-    .card-agendamento {
-      background: #242424;
+    .tabs { display: flex; gap: 8px; }
+
+    .tab-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--borda);
       border-radius: 8px;
-      padding: 0.9rem 1.1rem;
-      display: grid;
-      grid-template-columns: 56px 1fr auto;
+      background: transparent;
+      color: var(--texto);
+      cursor: pointer;
+      font-size: 0.88rem;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: var(--preto);
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ── Main ── */
+    main { padding: 20px; max-width: 620px; margin: 0 auto; }
+
+    .tab-content         { display: none; }
+    .tab-content.active  { display: block; }
+
+    /* ── Nav data ── */
+    .nav-data {
+      display: flex;
       align-items: center;
-      gap: 1rem;
-      border-left: 3px solid #c9a84c;
+      justify-content: space-between;
+      background: var(--cinza);
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
     }
-    .card-hora { font-size: 1.15rem; font-weight: 800; color: #c9a84c; }
-    .card-info .cliente  { font-weight: 700; color: #e0e0e0; font-size: 0.95rem; }
-    .card-info .servico  { font-size: 0.82rem; color: #888; margin-top: 2px; }
-    .card-barbeiro {
-      font-size: 0.78rem;
-      color: #aaa;
-      background: #2e2e2e;
-      border-radius: 99px;
-      padding: 3px 10px;
-      white-space: nowrap;
+    .nav-data button {
+      background: none; border: none;
+      color: var(--accent); font-size: 1.5rem;
+      cursor: pointer; padding: 0 8px;
+    }
+    .nav-data span { font-weight: 600; }
+
+    /* ── Cards de agendamento ── */
+    .card {
+      background: var(--cinza);
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .card .horario { font-size: 1.1rem; font-weight: 700; color: var(--accent); min-width: 50px; }
+    .card .info    { flex: 1; }
+    .card .nome    { font-weight: 600; font-size: 0.95rem; }
+    .card .servico { font-size: 0.82rem; color: #999; margin-top: 2px; }
+    .card .acoes   { display: flex; align-items: center; gap: 8px; }
+
+    .badge {
+      font-size: 0.72rem; padding: 2px 8px;
+      border-radius: 20px; border: 1px solid;
+    }
+    .badge-agendado  { color: var(--accent);   border-color: var(--accent); }
+    .badge-concluido { color: var(--verde);    border-color: var(--verde); }
+    .badge-cancelado { color: var(--vermelho); border-color: var(--vermelho); }
+
+    .btn-cancelar {
+      background: none; border: 1px solid var(--vermelho);
+      color: var(--vermelho); border-radius: 6px;
+      padding: 4px 10px; font-size: 0.8rem; cursor: pointer;
+    }
+    .btn-cancelar:hover { background: var(--vermelho); color: #fff; }
+
+    .vazio { text-align: center; color: #555; padding: 48px 0; font-size: 0.9rem; }
+
+    /* ── Configurações ── */
+    .secao {
+      background: var(--cinza);
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .secao h3 { font-size: 0.9rem; color: var(--accent); margin-bottom: 12px; }
+
+    .linha {
+      display: flex; gap: 12px;
+      align-items: center; margin-bottom: 10px;
+    }
+    .linha label { font-size: 0.83rem; color: #999; min-width: 90px; }
+    .linha input, .linha select {
+      flex: 1;
+      background: var(--preto); border: 1px solid var(--borda);
+      border-radius: 6px; color: var(--texto);
+      padding: 8px 10px; font-size: 0.88rem;
     }
 
-    /* === ESTADOS VAZIOS / CARREGANDO === */
-    .estado-vazio {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: #555;
-      font-size: 0.9rem;
+    .dias-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+    .dia-check {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+      font-size: 0.75rem; cursor: pointer;
     }
-    .estado-vazio .icone { display: block; font-size: 2.2rem; margin-bottom: 0.5rem; }
+    .dia-check input { width: 18px; height: 18px; accent-color: var(--accent); }
 
-    /* === RESPONSIVO === */
-    @media (max-width: 580px) {
-      .dia-celula { min-height: 46px; }
-      .card-agendamento { grid-template-columns: 50px 1fr; }
-      .card-barbeiro { display: none; }
-      header h1 { font-size: 1.1rem; }
+    /* Serviços */
+    .sv-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .sv-item input {
+      flex: 1; background: var(--preto); border: 1px solid var(--borda);
+      border-radius: 6px; color: var(--texto); padding: 7px 10px; font-size: 0.85rem;
     }
-  </style>
-</head>
-<body>
+    .btn-remover {
+      background: none; border: 1px solid var(--vermelho);
+      color: var(--vermelho); border-radius: 6px;
+      padding: 6px 10px; cursor: pointer; font-size: 0.85rem;
+    }
+    .btn-add {
+      background: none; border: 1px dashed var(--borda);
+      color: #777; border-radius: 8px;
+      padding: 8px; cursor: pointer; font-size: 0.85rem; width: 100%; margin-top: 4px;
+    }
+    .btn-add:hover { border-color: var(--accent); color: var(--accent); }
 
-  <!-- ==================== CABEÇALHO ==================== -->
-  <header>
-    <h1>✂️ Barbearia — Agendamentos</h1>
-    <span>Painel interno · somente visualização</span>
-  </header>
+    .btn-salvar {
+      background: var(--accent); color: var(--preto);
+      border: none; border-radius: 8px;
+      padding: 10px 20px; font-weight: 700;
+      cursor: pointer; font-size: 0.9rem; width: 100%;
+    }
+    .btn-salvar:hover { opacity: 0.85; }
 
-  <main>
-
-    <!-- ==================== CONTROLES ==================== -->
-    <section class="controls" aria-label="Navegação de mês e ano">
-      <label for="selectMes">Mês:</label>
-      <select id="selectMes" aria-label="Selecionar mês"></select>
-
-      <label for="selectAno">Ano:</label>
-      <select id="selectAno" aria-label="Selecionar ano"></select>
-
-      <button id="btnHoje" type="button">Hoje</button>
-    </section>
-
-    <!-- ==================== CALENDÁRIO ==================== -->
-    <section class="calendario" aria-label="Calendário mensal">
-      <h2 id="tituloCalendario"></h2>
-
-      <!-- Cabeçalho dos dias da semana -->
-      <div class="grade-semana" role="row" aria-hidden="true">
-        <span>Dom</span><span>Seg</span><span>Ter</span>
-        <span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
-      </div>
-
-      <!-- Grid dos dias — preenchido via JavaScript -->
-      <div id="gradeDias" class="grade-dias" role="grid"></div>
-    </section>
-
-    <!-- ==================== PAINEL DE DETALHES ==================== -->
-    <section class="painel-detalhes" aria-label="Detalhes dos agendamentos do dia">
-      <h2 id="tituloPainel">Selecione um dia no calendário</h2>
-
-      <!-- Cartões de agendamento — preenchidos via JavaScript -->
-      <div id="areaDosCartoes">
-        <div class="estado-vazio">
-          <span class="icone">📅</span>
-          Clique em um dia para listar os agendamentos.
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <script src="script.js"></script>
-</body>
-</html>
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+    }
