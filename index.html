@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barbearia — Painel de Agendamentos</title>
+  <style>
+    /* === RESET & BASE === */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    /* === CABEÇALHO === */
+    header {
+      background: #1a1a1a;
+      border-bottom: 2px solid #c9a84c;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    header h1 { font-size: 1.4rem; color: #c9a84c; letter-spacing: 1px; }
+    header span { font-size: 0.85rem; color: #666; margin-left: auto; }
+
+    /* === LAYOUT PRINCIPAL === */
+    main { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+
+    /* === CONTROLES DE MÊS/ANO === */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .controls label { color: #888; font-size: 0.85rem; }
+    .controls select {
+      background: #1e1e1e;
+      color: #e0e0e0;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .controls select:focus { outline: none; border-color: #c9a84c; }
+    .controls button {
+      background: #c9a84c;
+      color: #111;
+      border: none;
+      border-radius: 6px;
+      padding: 0.45rem 1.1rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .controls button:hover { background: #b8943e; }
+
+    /* === CALENDÁRIO === */
+    .calendario {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #2a2a2a;
+    }
+    .calendario h2 {
+      text-align: center;
+      color: #c9a84c;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .grade-semana {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .grade-semana span {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #666;
+      text-transform: uppercase;
+      padding: 0.25rem 0;
+    }
+    .grade-dias {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .dia-celula {
+      min-height: 62px;
+      border-radius: 8px;
+      padding: 6px 4px;
+      cursor: pointer;
+      background: #222;
+      border: 1px solid transparent;
+      transition: border-color 0.15s, background 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .dia-celula:hover  { border-color: #c9a84c; background: #2a2a2a; }
+    .dia-celula.ativo  { border-color: #c9a84c; background: #2e2a1a; }
+    .dia-celula.vazio  { background: transparent; cursor: default; pointer-events: none; border-color: transparent; }
+    .dia-celula.hoje .num-dia { color: #c9a84c; font-weight: 800; }
+    .num-dia { font-size: 0.85rem; color: #ccc; font-weight: 600; }
+    .qtd-badge {
+      background: #c9a84c;
+      color: #111;
+      font-size: 0.68rem;
+      font-weight: 800;
+      border-radius: 99px;
+      padding: 1px 7px;
+    }
+
+    /* === PAINEL DE DETALHES === */
+    .painel-detalhes {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid #2a2a2a;
+      min-height: 220px;
+    }
+    .painel-detalhes h2 {
+      color: #c9a84c;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      text-transform: capitalize;
+    }
+
+    /* === CARDS DE AGENDAMENTOS === */
+    .lista-agendamentos { display: flex; flex-direction: column; gap: 0.65rem; }
+    .card-agendamento {
+      background: #242424;
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      border-left: 3px solid #c9a84c;
+    }
+    .card-hora { font-size: 1.15rem; font-weight: 800; color: #c9a84c; }
+    .card-info .cliente  { font-weight: 700; color: #e0e0e0; font-size: 0.95rem; }
+    .card-info .servico  { font-size: 0.82rem; color: #888; margin-top: 2px; }
+    .card-barbeiro {
+      font-size: 0.78rem;
+      color: #aaa;
+      background: #2e2e2e;
+      border-radius: 99px;
+      padding: 3px 10px;
+      white-space: nowrap;
+    }
+
+    /* === ESTADOS VAZIOS / CARREGANDO === */
+    .estado-vazio {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #555;
+      font-size: 0.9rem;
+    }
+    .estado-vazio .icone { display: block; font-size: 2.2rem; margin-bottom: 0.5rem; }
+
+    /* === RESPONSIVO === */
+    @media (max-width: 580px) {
+      .dia-celula { min-height: 46px; }
+      .card-agendamento { grid-template-columns: 50px 1fr; }
+      .card-barbeiro { display: none; }
+      header h1 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== CABEÇALHO ==================== -->
+  <header>
+    <h1>✂️ Barbearia — Agendamentos</h1>
+    <span>Painel interno · somente visualização</span>
+  </header>
+
+  <main>
+
+    <!-- ==================== CONTROLES ==================== -->
+    <section class="controls" aria-label="Navegação de mês e ano">
+      <label for="selectMes">Mês:</label>
+      <select id="selectMes" aria-label="Selecionar mês"></select>
+
+      <label for="selectAno">Ano:</label>
+      <select id="selectAno" aria-label="Selecionar ano"></select>
+
+      <button id="btnHoje" type="button">Hoje</button>
+    </section>
+
+    <!-- ==================== CALENDÁRIO ==================== -->
+    <section class="calendario" aria-label="Calendário mensal">
+      <h2 id="tituloCalendario"></h2>
+
+      <!-- Cabeçalho dos dias da semana -->
+      <div class="grade-semana" role="row" aria-hidden="true">
+        <span>Dom</span><span>Seg</span><span>Ter</span>
+        <span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+      </div>
+
+      <!-- Grid dos dias — preenchido via JavaScript -->
+      <div id="gradeDias" class="grade-dias" role="grid"></div>
+    </section>
+
+    <!-- ==================== PAINEL DE DETALHES ==================== -->
+    <section class="painel-detalhes" aria-label="Detalhes dos agendamentos do dia">
+      <h2 id="tituloPainel">Selecione um dia no calendário</h2>
+
+      <!-- Cartões de agendamento — preenchidos via JavaScript -->
+      <div id="areaDosCartoes">
+        <div class="estado-vazio">
+          <span class="icone">📅</span>
+          Clique em um dia para listar os agendamentos.
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
